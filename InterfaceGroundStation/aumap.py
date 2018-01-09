@@ -26,11 +26,12 @@ inclangs= [0] * len(listincl)
 for j in range(len(listincl)):
     inclangs[j]=float(listincl[j])
 # Define the colors we will use in RGB format
-YELLOW = (255,   255,   0)
+YELLOW = (255, 255,  0)
 WHITE = (255, 255, 255)
 BLUE =  (  0,   0, 255)
 GREEN = (  0, 255,   0)
 RED =   (255,   0,   0)
+BLACK = (  0,   0,   0)
 #Start the pygame interface
 pygame.init()
 #Initialize values for the visual interface
@@ -44,7 +45,8 @@ layer = pygame.image.load("mapaarhusn.png")
 cursor=pygame.image.load("arrow.png")
 circul=pygame.image.load("boy.png")
 #Initializing variables for visual objects
-ind=0
+ind1=0
+ind2=0
 coordx,coordy=0,0
 mousex,mousey=0,0
 movex, movey=0,0
@@ -52,6 +54,7 @@ endx,endy=0,0
 opx,opy=0,0
 slope=0
 angledeg=0
+inclang=0
 #This scale is based on the map size to point the sky correctly
 scale=5
 #Draw the map in the screen
@@ -60,23 +63,33 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-            sys.exit() #Exit execution when closing window
+            sys.exit() #Exit execution when closing wind1ow
+        #You can use the left-right keys to change de direction angle
         elif event.type == pygame.KEYDOWN:
             if event.key == K_LEFT: #When left key gets pressed
-                print angledeg, inclang
-                if ind > 0: #safe limits
-                    ind-=1
+                if ind1 > 0: #safe limits
+                    ind1-=1
+                    print angledeg,inclang
             elif event.key == K_RIGHT: #when right key gets pressed
-                print angledeg, inclang
-                if ind <len(inclangs): #safe limits
-                    ind+=1
+                if ind1 <(len(listang)-1): #safe limits
+                    ind1+=1
+                    print angledeg,inclang
+            #You can use the up-down keys to change de inclination angle
+            elif event.key == K_UP: #When up key gets pressed
+                if ind2 > 0: #safe limits
+                    ind2-=1
+                    print angledeg,inclang
+            elif event.key == K_DOWN: #when down key gets pressed
+                if ind2 <(len(listincl)-1): #safe limits
+                    ind2+=1
+                    print angledeg,inclang
     mousex,mousey=pygame.mouse.get_pos() #gets the position of the cursor
     mousex-=10
     mousey-=20 #alligns the cursor icon
     #Choose an angle and slope from the list created by the csv file
-    angledeg=angles[ind]
-    slope=slopel[ind]
-    inclang=inclangs[ind]
+    angledeg=angles[ind1]
+    slope=slopel[ind1]
+    inclang=inclangs[ind2]
     #Chooses the end coordinates of each line to be drawn according to angle
     #When angle between 0 and 89
     if angledeg < 90.0:
@@ -166,6 +179,8 @@ while True:
         opx=width/2
     #The screen is updated by:
     pygame.display.update()
+    #Black background
+    screen.fill(BLACK)
     #Drawing map again
     screen.blit(layer,(0,0))
     #Drawing image objects
