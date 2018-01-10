@@ -55,6 +55,7 @@ opx,opy=0,0
 slope=0
 angledeg=0
 inclang=0
+myfont=pygame.font.Font(None,30)
 #This scale is based on the map size to point the sky correctly
 scale=5
 #Draw the map in the screen
@@ -181,14 +182,19 @@ while True:
     pygame.display.update()
     #Black background
     screen.fill(BLACK)
-    #Drawing map again
+    #Draw map again
     screen.blit(layer,(0,0))
-    #Drawing image objects
+    #Draw image objects
     screen.blit(cursor,(mousex,mousey))
     screen.blit(circul,(coordx,coordy))
-    #Drawing the lines
+    #Draw the lines
     pygame.draw.line(screen,YELLOW,(width/2,height/2),(opx,opy),3)
     pygame.draw.line(screen,GREEN,(width/2,height/2),(endx,endy),3)
+    #Draw text right side of screen
+    textang1=myfont.render("Angle 1: "+str(angledeg)+" degrees",0,GREEN)
+    textang2=myfont.render("Angle 2: "+str(inclang)+" degrees",0,BLUE)
+    screen.blit(textang1,(1000,80))
+    screen.blit(textang2,(1000,110))
     
     
     
