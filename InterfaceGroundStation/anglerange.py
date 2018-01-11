@@ -5,11 +5,12 @@ Created on Tue Jan 09 11:59:51 2018
 @author: esteban struve
 """
 import csv
+
 #Define limits for the range of angles of direction and inclination
-firstdirec=70
-lastdirec=100
+firstdirec=0
+lastdirec=360
 minang=0
-maxang=180
+maxang=120
 #Build the ranges
 angdir=range(firstdirec,lastdirec+1)
 angincl=range(minang,maxang+1)

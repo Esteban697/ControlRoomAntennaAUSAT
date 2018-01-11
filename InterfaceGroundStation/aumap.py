@@ -43,7 +43,7 @@ screen = pygame.display.set_mode(screensize)
 pygame.display.set_caption("Aarhus Map")
 layer = pygame.image.load("mapaarhusn.png") 
 cursor=pygame.image.load("arrow.png")
-circul=pygame.image.load("boy.png")
+circul=pygame.image.load("bluecircle.png")
 #Initializing variables for visual objects
 ind1=0
 ind2=0
@@ -70,20 +70,20 @@ while True:
             if event.key == K_LEFT: #When left key gets pressed
                 if ind1 > 0: #safe limits
                     ind1-=1
-                    print angledeg,inclang
+                    print endx,endy,opx,opy
             elif event.key == K_RIGHT: #when right key gets pressed
                 if ind1 <(len(listang)-1): #safe limits
                     ind1+=1
-                    print angledeg,inclang
+                    print endx,endy,opx,opy
             #You can use the up-down keys to change de inclination angle
             elif event.key == K_UP: #When up key gets pressed
                 if ind2 > 0: #safe limits
                     ind2-=1
-                    print angledeg,inclang
+                    print endx,endy,opx,opy
             elif event.key == K_DOWN: #when down key gets pressed
                 if ind2 <(len(listincl)-1): #safe limits
                     ind2+=1
-                    print angledeg,inclang
+                    print endx,endy,opx,opy
     mousex,mousey=pygame.mouse.get_pos() #gets the position of the cursor
     mousex-=10
     mousey-=20 #alligns the cursor icon
@@ -96,11 +96,11 @@ while True:
     if angledeg < 90.0:
         endy=0
         endx=(width/2)-((width/2)*slope)
-        opy=height
-        opx=(width/2)+((width/2)*slope)
         if endx<0:
             endy=(height/2)-((height/2)/slope)
             endx=0
+        opy=height-endy
+        opx=width-endx
         #Calculate the (x,y) coordinates in the line according to inclination
         if inclang < 45: #from 0 to 44 degrees inclincation
             if endx == width/2:
@@ -131,11 +131,11 @@ while True:
         else:
             endy=height
             endx=(width/2)+((width/2)*slope)
-            opy=0
-            opx=(width/2)-((width/2)*slope)
             if endx<0:
                 endy=(height/2)-((height/2)/slope)
                 endx=0
+        opy=height-endy
+        opx=width-endx
         #Calculate the (x,y) coordinates in the line according to inclination
         if endy == height/2:
             coordx=inclang*((width/2)/90)
@@ -152,11 +152,11 @@ while True:
         else:
             endy=height
             endx=(width/2)+((width/2)*slope)
-            opy=0
-            opx=(width/2)-((width/2)*slope)
             if endx>width:
                 endy=(height/2)+((height/2)/slope)
                 endx=width
+            opy=height-endy
+            opx=width-endx
     #When angle between 270 and 359
     elif angledeg < 360.0:
         if angledeg == 270:
@@ -167,11 +167,11 @@ while True:
         else:
             endy=0
             endx=(width/2)-((width/2)*slope)
-            opy=height
-            opx=(width/2)+((width/2)*slope)
             if endx>width:
                 endy=(height/2)+((height/2)/slope)
                 endx=width
+            opy=height-endy
+            opx=width-endx
     #When angle exactly 360
     else:
         endy=0
