@@ -45,6 +45,7 @@ layer = pygame.image.load("mapaarhusn.png")
 cursor=pygame.image.load("arrow.png")
 circul=pygame.image.load("bluecircle.png")
 #Initializing variables for visual objects
+m=0
 ind1=0
 ind2=0
 coordx,coordy=0,0
@@ -56,6 +57,7 @@ slope=0
 angledeg=0
 inclang=0
 myfont=pygame.font.Font(None,30)
+myfont2=pygame.font.Font(None,20)
 #This scale is based on the map size to point the sky correctly
 scale=5
 #Draw the map in the screen
@@ -70,20 +72,20 @@ while True:
             if event.key == K_LEFT: #When left key gets pressed
                 if ind1 > 0: #safe limits
                     ind1-=1
-                    print endx,endy,opx,opy
+                    print m,coordx,coordy
             elif event.key == K_RIGHT: #when right key gets pressed
                 if ind1 <(len(listang)-1): #safe limits
                     ind1+=1
-                    print endx,endy,opx,opy
+                    print m,coordx,coordy
             #You can use the up-down keys to change de inclination angle
             elif event.key == K_UP: #When up key gets pressed
                 if ind2 > 0: #safe limits
                     ind2-=1
-                    print endx,endy,opx,opy
+                    print m,coordx,coordy
             elif event.key == K_DOWN: #when down key gets pressed
                 if ind2 <(len(listincl)-1): #safe limits
                     ind2+=1
-                    print endx,endy,opx,opy
+                    print m,coordx,coordy
     mousex,mousey=pygame.mouse.get_pos() #gets the position of the cursor
     mousex-=10
     mousey-=20 #alligns the cursor icon
@@ -102,25 +104,10 @@ while True:
         opy=height-endy
         opx=width-endx
         #Calculate the (x,y) coordinates in the line according to inclination
-        if inclang < 45: #from 0 to 44 degrees inclincation
-            if endx == width/2:
-                coordx=width/2
-                coordy=inclang*((height/2)/90)
-            else:
-                distxgrad=((width/2)-endx)/90
-                coordx=distxgrad*inclang+endx
-                coordy=((((height/2)-endy)/((width/2)-endx))*(coordx-endx))
-        else: #from 45 to 89 degrees inclincation
-            if inclang==45: #correction for non-linear calc
-                distxgrad=(width/2)/90
-                coordx=23+distxgrad*inclang+endx
-            elif inclang == 46: #correction for non-linear calc
-                distxgrad=(width/2)/90
-                coordx=14+distxgrad*inclang+endx
-            else:
-                distxgrad=(width/2)/90
-                coordx=distxgrad*inclang+endx
-                coordy=(((height/2)-endy)/((width/2)-endx))*(coordx-endx)+endy
+        if (endx-opx)!=0:
+            m=((endy-opy)/(endx-opx))
+        coordx=endx-(((endx-opx)/180)*inclang)
+        coordy=endy-((m*((endx-opx)/180))*inclang)
     #When angle between 90 and 179
     elif angledeg < 180.0:
         if angledeg == 90:
@@ -137,11 +124,10 @@ while True:
         opy=height-endy
         opx=width-endx
         #Calculate the (x,y) coordinates in the line according to inclination
-        if endy == height/2:
-            coordx=inclang*((width/2)/90)
-            coordy=height/2
-        #else:
-            
+        if (endx-opx)!=0:
+            m=((endy-opy)/(endx-opx))
+        coordx=endx-(((endx-opx)/180)*inclang)
+        coordy=endy-((m*((endx-opx)/180))*inclang)
     #When angle between 180 and 269
     elif angledeg < 270.0:
         if angledeg == 180:
@@ -157,6 +143,11 @@ while True:
                 endx=width
             opy=height-endy
             opx=width-endx
+            #Calculate the (x,y) coordinates in the line according to inclination
+            if (endx-opx)!=0:
+                m=((endy-opy)/(endx-opx))
+            coordx=endx-(((endx-opx)/180)*inclang)
+            coordy=endy-((m*((endx-opx)/180))*inclang)
     #When angle between 270 and 359
     elif angledeg < 360.0:
         if angledeg == 270:
@@ -172,6 +163,11 @@ while True:
                 endx=width
             opy=height-endy
             opx=width-endx
+            #Calculate the (x,y) coordinates in the line according to inclination
+            if (endx-opx)!=0:
+                m=((endy-opy)/(endx-opx))
+            coordx=endx-(((endx-opx)/180)*inclang)
+            coordy=endy-((m*((endx-opx)/180))*inclang)
     #When angle exactly 360
     else:
         endy=0
@@ -184,17 +180,20 @@ while True:
     screen.fill(BLACK)
     #Draw map again
     screen.blit(layer,(0,0))
-    #Draw image objects
-    screen.blit(cursor,(mousex,mousey))
-    screen.blit(circul,(coordx,coordy))
     #Draw the lines
     pygame.draw.line(screen,YELLOW,(width/2,height/2),(opx,opy),3)
     pygame.draw.line(screen,GREEN,(width/2,height/2),(endx,endy),3)
     #Draw text right side of screen
     textang1=myfont.render("Angle 1: "+str(angledeg)+" degrees",0,GREEN)
     textang2=myfont.render("Angle 2: "+str(inclang)+" degrees",0,BLUE)
+    textcirc=myfont2.render(str(inclang),0,BLUE)
     screen.blit(textang1,(1000,80))
     screen.blit(textang2,(1000,110))
+    #Draw image objects
+    screen.blit(cursor,(mousex,mousey))
+    screen.blit(circul,(coordx-30,coordy-30))
+    #Draw text for angles insode circle
+    screen.blit(textcirc,(coordx,coordy))
     
     
     
