@@ -16,7 +16,7 @@ angdir=range(firstdirec,lastdirec+1)
 angincl=range(minang,maxang+1)
 #Store data into a single csv file
 myData = [angdir, angincl]  
-myFile = open('angles2.csv', 'w')  
+myFile = open('angles.csv', 'w')  
 with myFile:  
    writer = csv.writer(myFile)
    writer.writerows(myData)

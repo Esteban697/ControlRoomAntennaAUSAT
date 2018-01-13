@@ -11,26 +11,28 @@ import math
 import csv
 
 #Read a csv file with the angle information
-original = file('angles2.csv')
+original = file('angles.csv')
 reader = csv.reader(original)
 listang = reader.next()
 listincl = reader.next()
-#The information about the slope direction of antenna in map
+#The information about the slope direction of antenna in map - Azimut
 slopel= [0] * len(listang)
-angles= [0] * len(listang)
+azangles= [0] * len(listang)
 for i in range(len(listang)):
-    angles[i]=float(listang[i])
-    slopel[i]=math.tan(math.radians(angles[i]))
-#Store the inclination angles as floats
-inclangs= [0] * len(listincl)
+    azangles[i]=float(listang[i])
+    slopel[i]=math.tan(math.radians(azangles[i]))
+#Store the inclination azangles as floats - Elevation
+elevangles= [0] * len(listincl)
 for j in range(len(listincl)):
-    inclangs[j]=float(listincl[j])
+    elevangles[j]=float(listincl[j])
 # Define the colors we will use in RGB format
 YELLOW = (255, 255,  0)
 WHITE = (255, 255, 255)
 BLUE =  (  0,   0, 255)
+BLUE2 = (204, 222, 243)
 GREEN = (  0, 255,   0)
 RED =   (255,   0,   0)
+ORANGE= (255,   154,   0)
 BLACK = (  0,   0,   0)
 #Start the pygame interface
 pygame.init()
@@ -55,7 +57,7 @@ endx,endy=0,0
 opx,opy=0,0
 slope=0
 angledeg=0
-inclang=0
+elevang=0
 myfont=pygame.font.Font(None,30)
 myfont2=pygame.font.Font(None,20)
 #This scale is based on the map size to point the sky correctly
@@ -90,9 +92,9 @@ while True:
     mousex-=10
     mousey-=20 #alligns the cursor icon
     #Choose an angle and slope from the list created by the csv file
-    angledeg=angles[ind1]
+    angledeg=azangles[ind1]
     slope=slopel[ind1]
-    inclang=inclangs[ind2]
+    elevang=elevangles[ind2]
     #Chooses the end coordinates of each line to be drawn according to angle
     #When angle between 0 and 89
     if angledeg < 90.0:
@@ -106,8 +108,8 @@ while True:
         #Calculate the (x,y) coordinates in the line according to inclination
         if (endx-opx)!=0:
             m=((endy-opy)/(endx-opx))
-        coordx=endx-(((endx-opx)/180)*inclang)
-        coordy=endy-((m*((endx-opx)/180))*inclang)
+        coordx=endx-(((endx-opx)/180)*elevang)
+        coordy=endy-((m*((endx-opx)/180))*elevang)
     #When angle between 90 and 179
     elif angledeg < 180.0:
         if angledeg == 90:
@@ -126,8 +128,8 @@ while True:
         #Calculate the (x,y) coordinates in the line according to inclination
         if (endx-opx)!=0:
             m=((endy-opy)/(endx-opx))
-        coordx=endx-(((endx-opx)/180)*inclang)
-        coordy=endy-((m*((endx-opx)/180))*inclang)
+        coordx=endx-(((endx-opx)/180)*elevang)
+        coordy=endy-((m*((endx-opx)/180))*elevang)
     #When angle between 180 and 269
     elif angledeg < 270.0:
         if angledeg == 180:
@@ -146,8 +148,8 @@ while True:
             #Calculate the (x,y) coordinates in the line according to inclination
             if (endx-opx)!=0:
                 m=((endy-opy)/(endx-opx))
-            coordx=endx-(((endx-opx)/180)*inclang)
-            coordy=endy-((m*((endx-opx)/180))*inclang)
+            coordx=endx-(((endx-opx)/180)*elevang)
+            coordy=endy-((m*((endx-opx)/180))*elevang)
     #When angle between 270 and 359
     elif angledeg < 360.0:
         if angledeg == 270:
@@ -166,8 +168,8 @@ while True:
             #Calculate the (x,y) coordinates in the line according to inclination
             if (endx-opx)!=0:
                 m=((endy-opy)/(endx-opx))
-            coordx=endx-(((endx-opx)/180)*inclang)
-            coordy=endy-((m*((endx-opx)/180))*inclang)
+            coordx=endx-(((endx-opx)/180)*elevang)
+            coordy=endy-((m*((endx-opx)/180))*elevang)
     #When angle exactly 360
     else:
         endy=0
@@ -183,17 +185,27 @@ while True:
     #Draw the lines
     pygame.draw.line(screen,YELLOW,(width/2,height/2),(opx,opy),3)
     pygame.draw.line(screen,GREEN,(width/2,height/2),(endx,endy),3)
-    #Draw text right side of screen
-    textang1=myfont.render("Angle 1: "+str(angledeg)+" degrees",0,GREEN)
-    textang2=myfont.render("Angle 2: "+str(inclang)+" degrees",0,BLUE)
-    textcirc=myfont2.render(str(inclang),0,BLUE)
+    #Create text right side of screen
+    texttit1=myfont.render("Angle values for antenna position:",0,ORANGE)
+    textang1=myfont.render("Azimut: "+str(angledeg)+" degrees",0,GREEN)
+    textang2=myfont.render("Elevation: "+str(elevang)+" degrees",0,BLUE)
+    texttit2=myfont.render("Position of cursor:",0,ORANGE)
+    textcursor=myfont.render("X: "+str(mousex)+" Y: "+str(mousey),0,YELLOW)
+    #Create angle value inside circle
+    textcirc=myfont2.render(str(int(elevang)),0,BLUE2)
+    textcircshad=myfont2.render(str(int(elevang)),0,BLACK)
+    #Draw text on the right side of the screen
+    screen.blit(texttit1,(1000,40))
     screen.blit(textang1,(1000,80))
     screen.blit(textang2,(1000,110))
-    #Draw image objects
+    screen.blit(texttit2,(1000,160))
+    screen.blit(textcursor,(1000,200))
+    #Draw image objects in map
     screen.blit(cursor,(mousex,mousey))
     screen.blit(circul,(coordx-30,coordy-30))
     #Draw text for angles insode circle
-    screen.blit(textcirc,(coordx,coordy))
+    screen.blit(textcircshad,(coordx-9,coordy+1))
+    screen.blit(textcirc,(coordx-10,coordy))
     
     
     
