@@ -26,13 +26,13 @@ elevangles= [0] * len(listincl)
 for j in range(len(listincl)):
     elevangles[j]=float(listincl[j])
 # Define the colors we will use in RGB format
-YELLOW = (255, 255,  0)
+YELLOW= (255, 255,   0)
 WHITE = (255, 255, 255)
 BLUE =  (  0,   0, 255)
 BLUE2 = (204, 222, 243)
 GREEN = (  0, 255,   0)
 RED =   (255,   0,   0)
-ORANGE= (255,   154,   0)
+ORANGE= (255, 154,   0)
 BLACK = (  0,   0,   0)
 #Start the pygame interface
 pygame.init()
@@ -41,12 +41,18 @@ pygame.init()
 mapsize = width, height = 930,930
 screensize = 1400,930
 screen = pygame.display.set_mode(screensize)
+margin = width+50
 #Loading image objects
 pygame.display.set_caption("Aarhus Map")
 layer = pygame.image.load("mapaarhusn.png") 
 cursor=pygame.image.load("arrow.png")
+margmarkx1=pygame.image.load("marginmarkerx1.png")
+margmarkx2=pygame.image.load("marginmarkerx2.png")
+margmarky1=pygame.image.load("marginmarkery1.png")
+margmarky2=pygame.image.load("marginmarkery2.png")
 circul=pygame.image.load("bluecircle.png")
 #Initializing variables for visual objects
+linerange=180
 m=0
 ind1=0
 ind2=0
@@ -58,7 +64,7 @@ opx,opy=0,0
 slope=0
 angledeg=0
 elevang=0
-myfont=pygame.font.Font(None,30)
+myfont=pygame.font.SysFont("Arial Black",20)
 myfont2=pygame.font.Font(None,20)
 #This scale is based on the map size to point the sky correctly
 scale=5
@@ -74,11 +80,11 @@ while True:
             if event.key == K_LEFT: #When left key gets pressed
                 if ind1 > 0: #safe limits
                     ind1-=1
-                    print m,coordx,coordy
+                    print angledeg,linerange
             elif event.key == K_RIGHT: #when right key gets pressed
                 if ind1 <(len(listang)-1): #safe limits
                     ind1+=1
-                    print m,coordx,coordy
+                    print angledeg,linerange
             #You can use the up-down keys to change de inclination angle
             elif event.key == K_UP: #When up key gets pressed
                 if ind2 > 0: #safe limits
@@ -89,8 +95,18 @@ while True:
                     ind2+=1
                     print m,coordx,coordy
     mousex,mousey=pygame.mouse.get_pos() #gets the position of the cursor
-    mousex-=10
-    mousey-=20 #alligns the cursor icon
+    #coordinates for map
+    if mousex > width:
+        mousex=width
+    elif mousex < 0:
+        mousex=0
+    if mousey > height:
+        mousey=height
+    elif mousey < 0:
+        mousey=0
+    #coordinates for cursor arrow to allign to arrow tip
+    arrowx=mousex-10
+    arrowy=mousey-20
     #Choose an angle and slope from the list created by the csv file
     angledeg=azangles[ind1]
     slope=slopel[ind1]
@@ -108,8 +124,10 @@ while True:
         #Calculate the (x,y) coordinates in the line according to inclination
         if (endx-opx)!=0:
             m=((endy-opy)/(endx-opx))
-        coordx=endx-(((endx-opx)/180)*elevang)
-        coordy=endy-((m*((endx-opx)/180))*elevang)
+        #linerange=130*math.cos(math.radians(angledeg))
+        linerange=180
+        coordx=endx-(((endx-opx)/linerange)*elevang)
+        coordy=endy-((m*((endx-opx)/linerange))*elevang)
     #When angle between 90 and 179
     elif angledeg < 180.0:
         if angledeg == 90:
@@ -191,17 +209,22 @@ while True:
     textang2=myfont.render("Elevation: "+str(elevang)+" degrees",0,BLUE)
     texttit2=myfont.render("Position of cursor:",0,ORANGE)
     textcursor=myfont.render("X: "+str(mousex)+" Y: "+str(mousey),0,YELLOW)
+    #Draw cursor margin markers
+    screen.blit(margmarkx1,(0,mousey-11))
+    screen.blit(margmarkx2,(width-30,mousey-11))
+    screen.blit(margmarky1,(mousex-11,0))
+    screen.blit(margmarky2,(mousex-11,height-30))
     #Create angle value inside circle
     textcirc=myfont2.render(str(int(elevang)),0,BLUE2)
     textcircshad=myfont2.render(str(int(elevang)),0,BLACK)
     #Draw text on the right side of the screen
-    screen.blit(texttit1,(1000,40))
-    screen.blit(textang1,(1000,80))
-    screen.blit(textang2,(1000,110))
-    screen.blit(texttit2,(1000,160))
-    screen.blit(textcursor,(1000,200))
+    screen.blit(texttit1,(margin,40))
+    screen.blit(textang1,(margin,80))
+    screen.blit(textang2,(margin,110))
+    screen.blit(texttit2,(margin,160))
+    screen.blit(textcursor,(margin,200))
     #Draw image objects in map
-    screen.blit(cursor,(mousex,mousey))
+    screen.blit(cursor,(arrowx,arrowy))
     screen.blit(circul,(coordx-30,coordy-30))
     #Draw text for angles insode circle
     screen.blit(textcircshad,(coordx-9,coordy+1))
