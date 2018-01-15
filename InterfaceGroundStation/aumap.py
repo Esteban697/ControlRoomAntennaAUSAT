@@ -64,13 +64,22 @@ opx,opy=0,0
 slope=0
 angledeg=0
 elevang=0
+seconds=0
+timer=0
 myfont=pygame.font.SysFont("Arial Black",20)
 myfont2=pygame.font.Font(None,20)
+timerrun=False
+clock=pygame.time.Clock()
+timerdisp=0
 #This scale is based on the map size to point the sky correctly
 scale=5
 #Draw the map in the screen
 screen.blit(layer,(0,0))
 while True:
+    if timerrun == True:
+        seconds=clock.get_time()/1000.0
+        timer+=seconds
+        timerdisp=math.trunc(timer)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -94,7 +103,10 @@ while True:
                 if ind2 <(len(listincl)-1): #safe limits
                     ind2+=1
                     print m,coordx,coordy
+    #Get information from the mouse
+    clicked=pygame.mouse.get_pressed()
     mousex,mousey=pygame.mouse.get_pos() #gets the position of the cursor
+    globmx,globmy=mousex,mousey
     #coordinates for map
     if mousex > width:
         mousex=width
@@ -208,7 +220,12 @@ while True:
     textang1=myfont.render("Azimut: "+str(angledeg)+" degrees",0,GREEN)
     textang2=myfont.render("Elevation: "+str(elevang)+" degrees",0,BLUE)
     texttit2=myfont.render("Position of cursor:",0,ORANGE)
+    texttit3=myfont.render("Time:",0,ORANGE)
     textcursor=myfont.render("X: "+str(mousex)+" Y: "+str(mousey),0,YELLOW)
+    texttime=myfont.render(str(timerdisp)+" seconds",0,YELLOW)
+    textbut1=myfont.render("Play",0,BLACK)
+    textbut2=myfont.render("Playing",0,BLACK)
+    textbut3=myfont.render("Stop",0,BLACK)
     #Draw cursor margin markers
     screen.blit(margmarkx1,(0,mousey-11))
     screen.blit(margmarkx2,(width-30,mousey-11))
@@ -223,12 +240,35 @@ while True:
     screen.blit(textang2,(margin,110))
     screen.blit(texttit2,(margin,160))
     screen.blit(textcursor,(margin,200))
+    screen.blit(texttit3,(margin,250))
+    screen.blit(texttime,(margin,290))
+    #Draw buttons on the right side of screen
+    #Configuration for button 1
+    if margin < globmx < margin+100 and 600 < globmy < 600+50:
+        pygame.draw.rect(screen,YELLOW,(margin,600,100,50))
+        if clicked[0] == 1:
+            timerrun=True
+    else:
+        pygame.draw.rect(screen,GREEN,(margin,600,100,50))
+    if timerrun == False:
+        screen.blit(textbut1,(margin+10,610))
+    else:
+        screen.blit(textbut2,(margin+10,610))
+    #Configuration for button 2
+    pygame.draw.rect(screen,RED,(margin+120,600,70,50))
+    screen.blit(textbut3,(margin+130,610))
+    if margin+130 < globmx < margin+230 and 600 < globmy < 600+50:
+        if clicked[0] == 1:
+            timerrun=False
+            seconds=0
     #Draw image objects in map
     screen.blit(cursor,(arrowx,arrowy))
     screen.blit(circul,(coordx-30,coordy-30))
     #Draw text for angles insode circle
     screen.blit(textcircshad,(coordx-9,coordy+1))
     screen.blit(textcirc,(coordx-10,coordy))
+    #Time is being counted
+    clock.tick()
     
     
     
