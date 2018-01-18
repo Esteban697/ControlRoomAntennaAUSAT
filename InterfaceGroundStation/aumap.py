@@ -2,14 +2,14 @@
 """
 Created on Thu Dec 21 16:07:20 2017
 
-@author: esteban struve
+@author: Esteban Struve
 """
-
+"""*******************************Libraries********************************"""
 import pygame, sys 
 from pygame.locals import *
 import math
 import csv
-
+"""*********************Reading angle information**************************"""
 #Read a csv file with the angle information
 original = file('angles.csv')
 reader = csv.reader(original)
@@ -25,9 +25,12 @@ for i in range(len(listang)):
 elevangles= [0] * len(listincl)
 for j in range(len(listincl)):
     elevangles[j]=float(listincl[j])
-# Define the colors we will use in RGB format
+"""***************************Initialization*******************************"""
+#Start the pygame interface
+pygame.init()
+#Initialize values for the VISUAL INTERFACE
+# Define the COLORS we will use in RGB format
 YELLOW= (255, 255,   0)
-WHITE = (255, 255, 255)
 BLUE =  (  0,   0, 255)
 BLUE2 = (204, 222, 243)
 GREEN = (  0, 255,   0)
@@ -35,29 +38,19 @@ RED =   (255,   0,   0)
 ORANGE= (255, 154,   0)
 BLACK = (  0,   0,   0)
 GREY1 = (200, 200, 200)
-#Start the pygame interface
-pygame.init()
-#Initialize values for the visual interface
+GREY2 = (50, 50, 50)
+GREY3 = (80, 80, 80)
 #Setting screen
-mapsize = width, height = 930,930
-screensize = 1400,930
+mapsize = width, height = 850,850
+screensize = 1500,850
 screen = pygame.display.set_mode(screensize)
-margin = width+120
-#Loading image objects
-pygame.display.set_caption("Aarhus Map")
-layer = pygame.image.load("mapaarhusn.png") 
-cursor=pygame.image.load("arrow.png")
-margmarkx1=pygame.image.load("marginmarkerx1.png")
-margmarkx2=pygame.image.load("marginmarkerx2.png")
-margmarky1=pygame.image.load("marginmarkery1.png")
-margmarky2=pygame.image.load("marginmarkery2.png")
-circul=pygame.image.load("bluecircle.png")
-switch1=pygame.image.load("switch1.png")
-switch2=pygame.image.load("switch2.png")
-switch3=pygame.image.load("switch3.png")
-switch4=pygame.image.load("switch4.png")
+#Setting margins in screen
+margtextx,margtexty = width+220,80
+margswitchx,margswitchy = width+40,140
+margmodex,margmodey = width+50,(height/2)+100
+margsw1x,margsw1y = margmodex+110,margmodey+40
+margin=0
 #Initializing variables for visual objects
-linerange=180
 m=0
 ind1=0
 ind2=0
@@ -71,17 +64,17 @@ angledeg=0
 elevang=0
 seconds=0
 timer=0
+timerdisp=0
+#Fonts for text
 myfont=pygame.font.SysFont("Arial Black",20)
 myfont2=pygame.font.Font(None,20)
-timerrun=False
+#Start clock
 clock=pygame.time.Clock()
-timerdisp=0
-boolswitch1=True
-boolswitch2=True
-#This scale is based on the map size to point the sky correctly
-scale=5
-#Draw the map in the screen
-screen.blit(layer,(0,0))
+#Booleans for states
+boolmode=True
+boolzoom=True
+timerrun=False
+"""*************************Pygame While Loop******************************"""
 while True:
     if timerrun == True:
         seconds=clock.get_time()/1000.0
@@ -93,23 +86,27 @@ while True:
             sys.exit() #Exit execution when closing wind1ow
         #You can use the left-right keys to change de direction angle
         elif event.type == pygame.KEYDOWN:
-            if event.key == K_LEFT: #When left key gets pressed
-                if ind1 > 0: #safe limits
-                    ind1-=1
-                    print angledeg,linerange
+            if event.key == K_LEFT:#When left key gets pressed
+                if boolmode == True:
+                    if ind1 > 0: #safe limits
+                        ind1-=1
+                        print angledeg
             elif event.key == K_RIGHT: #when right key gets pressed
-                if ind1 <(len(listang)-1): #safe limits
-                    ind1+=1
-                    print angledeg,linerange
+                if boolmode == True:
+                    if ind1 <(len(listang)-1): #safe limits
+                        ind1+=1
+                        print angledeg
             #You can use the up-down keys to change de inclination angle
             elif event.key == K_UP: #When up key gets pressed
-                if ind2 > 0: #safe limits
-                    ind2-=1
-                    print m,coordx,coordy
+                if boolmode == True:
+                    if ind2 > 0: #safe limits
+                        ind2-=1
+                        print m,coordx,coordy
             elif event.key == K_DOWN: #when down key gets pressed
-                if ind2 <(len(listincl)-1): #safe limits
-                    ind2+=1
-                    print m,coordx,coordy
+                if boolmode == True:
+                    if ind2 <(len(listincl)-1): #safe limits
+                        ind2+=1
+                        print m,coordx,coordy
     #Get information from the mouse
     clicked=pygame.mouse.get_pressed()
     mousex,mousey=pygame.mouse.get_pos() #gets the position of the cursor
@@ -143,10 +140,8 @@ while True:
         #Calculate the (x,y) coordinates in the line according to inclination
         if (endx-opx)!=0:
             m=((endy-opy)/(endx-opx))
-        #linerange=130*math.cos(math.radians(angledeg))
-        linerange=180
-        coordx=endx-(((endx-opx)/linerange)*elevang)
-        coordy=endy-((m*((endx-opx)/linerange))*elevang)
+        coordx=endx-(((endx-opx)/180)*elevang)
+        coordy=endy-((m*((endx-opx)/180))*elevang)
     #When angle between 90 and 179
     elif angledeg < 180.0:
         if angledeg == 90:
@@ -213,19 +208,38 @@ while True:
         endx=width/2
         opy=0
         opx=width/2
-    #The screen is updated by:
+    #Loading image objects
+    pygame.display.set_caption("Ground Station")
+    if boolzoom == True:
+        layer = pygame.image.load("mapaarhusn.png")
+    else:
+        layer = pygame.image.load("mapaarhus.png")
+    cursor=pygame.image.load("arrow.png")
+    margmarkx1=pygame.image.load("marginmarkerx1.png")
+    margmarkx2=pygame.image.load("marginmarkerx2.png")
+    margmarky1=pygame.image.load("marginmarkery1.png")
+    margmarky2=pygame.image.load("marginmarkery2.png")
+    circul=pygame.image.load("bluecircle.png")
+    switch1=pygame.image.load("switch1.png")
+    switch2=pygame.image.load("switch2.png")
+    switch3=pygame.image.load("switch3.png")
+    switch4=pygame.image.load("switch4.png")
+    """*************************UPDATE SCREEN*******************************"""
     pygame.display.update()
     #Black background
-    screen.fill(BLACK)
-    #Draw map again
+    screen.fill(GREY2)
+    #Draw map
     screen.blit(layer,(0,0))
+    #Draw information boxes
+    pygame.draw.rect(screen,GREY3,(margtextx-100,margtexty-50,450,450))
+    pygame.draw.rect(screen,GREY3,(margmodex,margmodey,520,200))
     #Draw the lines
     pygame.draw.line(screen,YELLOW,(width/2,height/2),(opx,opy),3)
     pygame.draw.line(screen,GREEN,(width/2,height/2),(endx,endy),3)
     #Create text right side of screen
     texttit1=myfont.render("Angle values:",0,ORANGE)
     textang1=myfont.render("Azimut: "+str(angledeg)+" degrees",0,GREEN)
-    textang2=myfont.render("Elevation: "+str(elevang)+" degrees",0,BLUE)
+    textang2=myfont.render("Elevation: "+str(elevang)+" degrees",0,BLUE2)
     texttit2=myfont.render("Position of cursor:",0,ORANGE)
     texttit3=myfont.render("Time:",0,ORANGE)
     textcursor=myfont.render("X: "+str(mousex)+" Y: "+str(mousey),0,YELLOW)
@@ -233,10 +247,8 @@ while True:
     textbut1=myfont.render("Play",0,BLACK)
     textbut2=myfont.render("Playing",0,BLACK)
     textbut3=myfont.render("Stop",0,BLACK)
-    textswi1=myfont.render("Manual",0,BLACK)
-    textswi2=myfont.render("Manual",0,GREY1)
-    textswi3=myfont.render("Auto",0,GREY1)
-    textswi4=myfont.render("Auto",0,BLACK)
+    textmanual1=myfont.render("Use the arrow keys",0,BLACK)
+    textmanual2=myfont.render("to navigate de values",0,BLACK)
     #Draw cursor margin markers
     screen.blit(margmarkx1,(0,mousey-11))
     screen.blit(margmarkx2,(width-30,mousey-11))
@@ -246,59 +258,58 @@ while True:
     textcirc=myfont2.render(str(int(elevang)),0,BLUE2)
     textcircshad=myfont2.render(str(int(elevang)),0,BLACK)
     #Draw text on the right side of the screen
-    screen.blit(texttit1,(margin,40))
-    screen.blit(textang1,(margin,80))
-    screen.blit(textang2,(margin,110))
-    screen.blit(texttit2,(margin,160))
-    screen.blit(textcursor,(margin,200))
-    screen.blit(texttit3,(margin,250))
-    screen.blit(texttime,(margin,290))
+    screen.blit(texttit1,(margtextx,margtexty))
+    screen.blit(textang1,(margtextx,margtexty+40))
+    screen.blit(textang2,(margtextx,margtexty+80))
+    screen.blit(texttit2,(margtextx,margtexty+130))
+    screen.blit(textcursor,(margtextx,margtexty+170))
+    screen.blit(texttit3,(margtextx,margtexty+220))
+    screen.blit(texttime,(margtextx,margtexty+260))
     #Draw the switches
-    #Configuration of switch 1
-    if margin-20 < globmx < margin+105 and 450 < globmy < 550:
+    #Configuration of switch 1 "Change Mode"
+    if margsw1x < globmx < margsw1x+150 and margsw1y < globmy < margsw1y+50:
         if clicked[0] == 1:
-            boolswitch1=True
-    if margin+105 < globmx < margin+230 and 450 < globmy < 550:
+            boolmode=True 
+    if margsw1x+150 < globmx < margsw1x+300 and margsw1y < globmy < margsw1y+50:
         if clicked[0] == 1:
-            boolswitch1=False
-    if boolswitch1 == True:
-        screen.blit(switch1,(margin-20,450))
-        screen.blit(textswi1,(margin+10,460))
-        screen.blit(textswi3,(margin+185,460))
+            boolmode=False
+    if boolmode == True:
+        screen.blit(switch1,(margsw1x,margsw1y))
     else:
-        screen.blit(switch2,(margin-20,450))
-        screen.blit(textswi2,(margin+10,460))
-        screen.blit(textswi4,(margin+185,460))
-    #Configuration of switch 2
-    if margin-80 < globmx < margin-30 and 50 < globmy < 175:
+        screen.blit(switch2,(margsw1x,margsw1y))
+    #Configuration of switch 2 "Zoom Map"
+    if margswitchx < globmx < margswitchx+50 and margswitchy < globmy < margswitchx+150:
         if clicked[0] == 1:
-            boolswitch2=True
-    if margin-80 < globmx < margin-30 and 175 < globmy < 300:
+            boolzoom=True
+    if margswitchx < globmx < margswitchx+50 and margswitchy+150 < globmy < margswitchy+300:
         if clicked[0] == 1:
-            boolswitch2=False
-    if boolswitch2 == True:
-        screen.blit(switch3,(margin-80,50))
+            boolzoom=False
+    if boolzoom == True:
+        screen.blit(switch3,(margswitchx,margswitchy))
     else:
-        screen.blit(switch4,(margin-80,50))
+        screen.blit(switch4,(margswitchx,margswitchy))
     #Draw buttons on the right side of screen
     #Configuration for button 1
-    if margin+40 < globmx < margin+140 and 600 < globmy < 600+50:
-        pygame.draw.rect(screen,YELLOW,(margin+40,600,100,50))
-        if clicked[0] == 1:
-            timerrun=True
+    if boolmode == False: #In Auto Mode
+        pygame.draw.rect(screen,GREEN,(margmodex+130,margmodey+110,100,50))
+        if margmodex+130 < globmx < margmodex+230 and margmodey+110 < globmy < margmodey+160:
+            if clicked[0] == 1:
+                timerrun=True
+        if timerrun == False:
+            screen.blit(textbut1,(margmodex+140,margmodey+120))
+        else:
+            pygame.draw.rect(screen,YELLOW,(margmodex+130,margmodey+110,100,50))
+            screen.blit(textbut2,(margmodex+140,margmodey+120))
+        #Configuration for button 2
+        pygame.draw.rect(screen,RED,(margmodex+300,margmodey+110,70,50))
+        screen.blit(textbut3,(margmodex+310,margmodey+120))
+        if margmodex+300 < globmx < margmodex+370 and margmodey+120 < globmy < margmodey+170:
+            if clicked[0] == 1:
+                timerrun=False
+                seconds=0
     else:
-        pygame.draw.rect(screen,GREEN,(margin+40,600,100,50))
-    if timerrun == False:
-        screen.blit(textbut1,(margin+50,610))
-    else:
-        screen.blit(textbut2,(margin+50,610))
-    #Configuration for button 2
-    pygame.draw.rect(screen,RED,(margin+160,600,70,50))
-    screen.blit(textbut3,(margin+170,610))
-    if margin+160 < globmx < margin+260 and 600 < globmy < 600+50:
-        if clicked[0] == 1:
-            timerrun=False
-            seconds=0
+        screen.blit(textmanual1,(margmodex+160,margmodey+110))
+        screen.blit(textmanual2,(margmodex+150,margmodey+140))
     #Draw image objects in map
     screen.blit(cursor,(arrowx,arrowy))
     screen.blit(circul,(coordx-30,coordy-30))
