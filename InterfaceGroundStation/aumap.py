@@ -44,6 +44,9 @@ GREY3 = (80, 80, 80)
 mapsize = width, height = 850,850
 screensize = 1500,850
 screen = pygame.display.set_mode(screensize)
+#Scaling of map with respect to angles
+scalex=(width/2)
+scaley=(height/2)
 #Setting margins in screen
 margtextx,margtexty = width+170,80
 margswitchx,margswitchy = width+40,140
@@ -113,7 +116,6 @@ while True:
                 if boolmode == True:
                     if ind1 <(len(listang)-1): #safe limits for index
                         ind1+=1
-                        print angledeg, coordx
             #You can use the up-down keys to change de inclination angle
             elif event.key == K_UP: #When up key gets pressed
                 if boolmode == True:
@@ -172,10 +174,8 @@ while True:
         opy=height-endy
         opx=width-endx
         #Calculate the (x,y) coordinates in the line according to inclination
-        if (endx-opx)!=0:
-            m=((endy-opy)/(endx-opx))
-        coordx=(width/2)-(math.sin(math.radians(angledeg)))*((width/2)*((90-elevang)/90))
-        coordy=(height/2)-(math.cos(math.radians(angledeg)))*((height/2)*((90-elevang)/90))
+        coordx=(width/2)-(math.sin(math.radians(angledeg)))*((scalex)*((90-elevang)/90))
+        coordy=(height/2)-(math.cos(math.radians(angledeg)))*((scaley)*((90-elevang)/90))
     #When angle between 90 and 179
     elif angledeg < 180.0:
         if angledeg == 90:
@@ -192,10 +192,8 @@ while True:
         opy=height-endy
         opx=width-endx
         #Calculate the (x,y) coordinates in the line according to inclination
-        if (endx-opx)!=0:
-            m=((endy-opy)/(endx-opx))
-        coordx=endx-(((endx-opx)/180)*elevang)
-        coordy=endy-((m*((endx-opx)/180))*elevang)
+        coordx=(width/2)-(math.sin(math.radians(angledeg)))*((scalex)*((90-elevang)/90))
+        coordy=(height/2)-(math.cos(math.radians(angledeg)))*((scaley)*((90-elevang)/90))
     #When angle between 180 and 269
     elif angledeg < 270.0:
         if angledeg == 180:
@@ -212,12 +210,10 @@ while True:
             opy=height-endy
             opx=width-endx
             #Calculate the (x,y) coordinates in the line according to inclination
-            if (endx-opx)!=0:
-                m=((endy-opy)/(endx-opx))
-            coordx=endx-(((endx-opx)/180)*elevang)
-            coordy=endy-((m*((endx-opx)/180))*elevang)
-    #When angle between 270 and 359
-    elif angledeg < 360.0:
+            coordx=(width/2)-(math.sin(math.radians(angledeg)))*((scalex)*((90-elevang)/90))
+            coordy=(height/2)-(math.cos(math.radians(angledeg)))*((scaley)*((90-elevang)/90))
+    #When angle between 270 and 360
+    elif angledeg <= 360.0:
         if angledeg == 270:
             endy=height/2
             endx=width
@@ -232,22 +228,18 @@ while True:
             opy=height-endy
             opx=width-endx
             #Calculate the (x,y) coordinates in the line according to inclination
-            if (endx-opx)!=0:
-                m=((endy-opy)/(endx-opx))
-            coordx=endx-(((endx-opx)/180)*elevang)
-            coordy=endy-((m*((endx-opx)/180))*elevang)
-    #When angle exactly 360
-    else:
-        endy=0
-        endx=width/2
-        opy=0
-        opx=width/2
+            coordx=(width/2)-(math.sin(math.radians(angledeg)))*((scalex)*((90-elevang)/90))
+            coordy=(height/2)-(math.cos(math.radians(angledeg)))*((scaley)*((90-elevang)/90))
     """**********************Loading image objects**************************"""
     pygame.display.set_caption("Ground Station")
     if boolzoom == True:
         layer = pygame.image.load("mapin.png")
+        scalex=(width/2)*2
+        scaley=(height/2)*2
     else:
         layer = pygame.image.load("mapout.png")
+        scalex=(width/2)*1.2
+        scaley=(height/2)*1.2
     cursor=pygame.image.load("arrow.png")
     margmarkx1=pygame.image.load("marginmarkerx1.png")
     margmarkx2=pygame.image.load("marginmarkerx2.png")
@@ -263,9 +255,9 @@ while True:
     #Update text
     textang1=myfont.render("Azimut: "+str(angledeg)+" degrees",0,GREEN)
     textang2=myfont.render("Elevation: "+str(elevang)+" degrees",0,BLUE2)
-    if boolcursor==True:
+    if boolcursor==True: 
         textcursor=myfont.render("X: "+str(mxdisp)+" Y: "+str(mydisp),0,YELLOW)
-    else:
+    else:#Freezes coordinates when saving location
         textcursor=myfont.render("X: "+str(mxfixed)+" Y: "+str(myfixed)+" fixed",0,YELLOW)
     texttime=myfont.render(str(timerdisp)+" seconds",0,YELLOW)
     #Black background
@@ -285,7 +277,7 @@ while True:
         screen.blit(margmarkx2,(width-30,mydisp-11))
         screen.blit(margmarky1,(mxdisp-11,0))
         screen.blit(margmarky2,(mxdisp-11,height-30))
-    else:
+    else: #Freeze margin markers
         screen.blit(margmarkx1,(0,myfixed-11))
         screen.blit(margmarkx2,(width-30,myfixed-11))
         screen.blit(margmarky1,(mxfixed-11,0))
@@ -297,7 +289,7 @@ while True:
     screen.blit(textang2,(margtextx,margtexty+80))
     screen.blit(texttit2,(margtextx,margtexty+130))
     screen.blit(textcursor,(margtextx,margtexty+170))
-    if boolcursor==True:
+    if boolcursor==True: #Changes text according to cursor mode
         screen.blit(textcursor1,(margtextx,margtexty+220))
     else:
         screen.blit(textcursor2,(margtextx,margtexty+220))
@@ -319,9 +311,11 @@ while True:
     if margswitchx < globmx < margswitchx+50 and margswitchy < globmy < margswitchx+150:
         if clicked[0] == 1:
             boolzoom=True
+            boolcursor=True #Drops location when map changes
     if margswitchx < globmx < margswitchx+50 and margswitchy+150 < globmy < margswitchy+300:
         if clicked[0] == 1:
             boolzoom=False
+            boolcursor=True #Drops location when map changes
     if boolzoom == True:
         screen.blit(switch3,(margswitchx,margswitchy))
     else:
@@ -369,6 +363,12 @@ while True:
     textcirc=myfont2.render(str(int(elevang)),0,BLUE2)
     textcircshad=myfont2.render(str(int(elevang)),0,BLACK)
     #Draw pointing circle in map
+    if coordx < 0 or coordy < 0: #if target out of map
+        coordx=endx
+        coordy=endy #target circle stays in ending of line
+    if coordx > width or coordy > height: #if tager out of map
+        coordx=endx
+        coordy=endy #target circle stays in ending of line
     screen.blit(circul,(coordx-30,coordy-30))
     #Draw text for angles insode circle
     screen.blit(textcircshad,(coordx-9,coordy+1))
