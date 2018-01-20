@@ -52,9 +52,9 @@ margsw1x,margsw1y = margmodex+110,margmodey+40
 margin=0
 #Initializing variables for visual objects
 m=0
-ind1=0
+ind1=0 #indexes to point to data in csv file
 ind2=0
-coordx,coordy=0,0
+coordx,coordy=0,0 #for map
 mousex,mousey=0,0
 mxdisp,mydisp=0,0
 mxfixed,myfixed=0,0
@@ -64,7 +64,7 @@ opx,opy=0,0
 slope=0
 angledeg=0
 elevang=0
-seconds=0
+seconds=0 #for time
 timer=0
 timerdisp=0
 #Fonts for text
@@ -92,41 +92,43 @@ boolcursor=True
 """*************************Pygame While Loop******************************"""
 while True:
     if timerrun == True:
+        #Measuring time enlapsed
         seconds=clock.get_time()/1000.0
         timer+=seconds
         timerdisp=math.trunc(timer)
+    #Events in the loop
     for event in pygame.event.get():
+        #Exit execution when closing window
         if event.type == pygame.QUIT:
             pygame.quit()
-            sys.exit() #Exit execution when closing wind1ow
-        #You can use the left-right keys to change de direction angle
+            sys.exit() 
+            """******************ARROW KEYS********************************"""
+        #Using the arrow keys to change de direction angle if in Manual Mode
         elif event.type == pygame.KEYDOWN:
             if event.key == K_LEFT:#When left key gets pressed
                 if boolmode == True:
-                    if ind1 > 0: #safe limits
+                    if ind1 > 0: #safe limits for index
                         ind1-=1
-                        print angledeg
             elif event.key == K_RIGHT: #when right key gets pressed
                 if boolmode == True:
-                    if ind1 <(len(listang)-1): #safe limits
+                    if ind1 <(len(listang)-1): #safe limits for index
                         ind1+=1
-                        print angledeg
+                        print angledeg, coordx
             #You can use the up-down keys to change de inclination angle
             elif event.key == K_UP: #When up key gets pressed
                 if boolmode == True:
-                    if ind2 > 0: #safe limits
+                    if ind2 > 0: #safe limits for index
                         ind2-=1
-                        print m,coordx,coordy
             elif event.key == K_DOWN: #when down key gets pressed
                 if boolmode == True:
-                    if ind2 <(len(listincl)-1): #safe limits
+                    if ind2 <(len(listincl)-1): #safe limits for index
                         ind2+=1
-                        print m,coordx,coordy
+    """****************************MOUSE************************************"""
     #Get information from the mouse
-    clicked=pygame.mouse.get_pressed()
+    clicked=pygame.mouse.get_pressed() #gets the buttons information
     mousex,mousey=pygame.mouse.get_pos() #gets the position of the cursor
     globmx,globmy=mousex,mousey
-    #coordinates for map
+    #coordinates inside the map
     if mousex > width:
         mousex=width
     elif mousex < 0:
@@ -150,10 +152,15 @@ while True:
     #coordinates for cursor arrow to allign to arrow tip
     arrowx=mxdisp-10
     arrowy=mydisp-20
+    """*******************SELECT ANGLE INFORMATION**************************"""
+    #If in Auto Mode the indexes are set by the clock
+    if boolmode==False:
+        ind1,ind2=timerdisp,timerdisp
     #Choose an angle and slope from the list created by the csv file
     angledeg=azangles[ind1]
     slope=slopel[ind1]
     elevang=elevangles[ind2]
+    """*****************Calculate Lines and Target**************************"""
     #Chooses the end coordinates of each line to be drawn according to angle
     #When angle between 0 and 89
     if angledeg < 90.0:
@@ -167,8 +174,8 @@ while True:
         #Calculate the (x,y) coordinates in the line according to inclination
         if (endx-opx)!=0:
             m=((endy-opy)/(endx-opx))
-        coordx=endx-(((endx-opx)/180)*elevang)
-        coordy=endy-((m*((endx-opx)/180))*elevang)
+        coordx=(width/2)-(math.sin(math.radians(angledeg)))*((width/2)*((90-elevang)/90))
+        coordy=(height/2)-(math.cos(math.radians(angledeg)))*((height/2)*((90-elevang)/90))
     #When angle between 90 and 179
     elif angledeg < 180.0:
         if angledeg == 90:
@@ -235,7 +242,7 @@ while True:
         endx=width/2
         opy=0
         opx=width/2
-    #Loading image objects
+    """**********************Loading image objects**************************"""
     pygame.display.set_caption("Ground Station")
     if boolzoom == True:
         layer = pygame.image.load("mapin.png")
@@ -263,6 +270,7 @@ while True:
     texttime=myfont.render(str(timerdisp)+" seconds",0,YELLOW)
     #Black background
     screen.fill(GREY2)
+    """***************************DRAWING MAP*******************************"""
     #Draw map
     screen.blit(layer,(0,0))
     #Draw information boxes
@@ -282,9 +290,7 @@ while True:
         screen.blit(margmarkx2,(width-30,myfixed-11))
         screen.blit(margmarky1,(mxfixed-11,0))
         screen.blit(margmarky2,(mxfixed-11,height-30))
-    #Create angle value inside circle
-    textcirc=myfont2.render(str(int(elevang)),0,BLUE2)
-    textcircshad=myfont2.render(str(int(elevang)),0,BLACK)
+    """***************************DRAWING TEXT******************************"""
     #Draw text on the right side of the screen
     screen.blit(texttit1,(margtextx,margtexty))
     screen.blit(textang1,(margtextx,margtexty+40))
@@ -297,7 +303,7 @@ while True:
         screen.blit(textcursor2,(margtextx,margtexty+220))
     screen.blit(texttit3,(margtextx,margtexty+260))
     screen.blit(texttime,(margtextx,margtexty+300))
-    #Draw the switches
+    """***************************SWITCHES*********************************"""
     #Configuration of switch 1 "Change Mode"
     if margsw1x < globmx < margsw1x+150 and margsw1y < globmy < margsw1y+50:
         if clicked[0] == 1:
@@ -320,7 +326,7 @@ while True:
         screen.blit(switch3,(margswitchx,margswitchy))
     else:
         screen.blit(switch4,(margswitchx,margswitchy))
-    #Draw buttons on the right side of screen
+    """****************************BUTTONS**********************************"""
     #Configuration for button 1
     if boolmode == False: #In Auto Mode
         pygame.draw.rect(screen,GREEN,(margmodex+110,margmodey+110,100,50))
@@ -352,16 +358,22 @@ while True:
     else:
         screen.blit(textmanual1,(margmodex+160,margmodey+110))
         screen.blit(textmanual2,(margmodex+150,margmodey+140))
+    """*****************************CURSOR*********************************"""
     #Draw cursor in map
     if boolcursor==True:
         screen.blit(cursor,(arrowx,arrowy))
     else:
         screen.blit(cursor,(mxfixed-10,myfixed-20))
+    """****************************TARGET**********************************"""
+    #Create angle value inside circle
+    textcirc=myfont2.render(str(int(elevang)),0,BLUE2)
+    textcircshad=myfont2.render(str(int(elevang)),0,BLACK)
     #Draw pointing circle in map
     screen.blit(circul,(coordx-30,coordy-30))
     #Draw text for angles insode circle
     screen.blit(textcircshad,(coordx-9,coordy+1))
     screen.blit(textcirc,(coordx-10,coordy))
+    """**************************TIME OF LOOP******************************"""
     #Time is being counted
     clock.tick()
     
