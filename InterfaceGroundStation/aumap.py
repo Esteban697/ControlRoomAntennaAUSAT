@@ -41,8 +41,8 @@ GREY1 = (200, 200, 200)
 GREY2 = (50, 50, 50)
 GREY3 = (80, 80, 80)
 #Setting screen
-mapsize = width, height = 850,850
-screensize = 1500,850
+mapsize = width, height = 800,800
+screensize = 1500,800
 screen = pygame.display.set_mode(screensize)
 #Scaling of map with respect to angles
 scalex=(width/2)
@@ -67,6 +67,14 @@ opx,opy=0,0
 slope=0
 angledeg=0
 elevang=0
+latcenter=56.171880
+longcenter=10.188323
+scalelatin=0.00004735 #lat x pixel
+scalelongin=0.00008642 #long x pixel
+scalelatout=0.006157 #lat x pixel
+scalelongout=0.01124 #long x pixel
+latdisp=0
+longdisp=0
 seconds=0 #for time
 timer=0
 timerdisp=0
@@ -147,6 +155,9 @@ while True:
         else:
             mxfixed=mousex
             myfixed=mousey
+            latfixed=latdisp
+            longfixed=longdisp
+            print mxfixed,myfixed
             if boolcursor==True:
                 boolcursor=False
             else:
@@ -154,6 +165,18 @@ while True:
     #coordinates for cursor arrow to allign to arrow tip
     arrowx=mxdisp-10
     arrowy=mydisp-20
+    #Translate the map pixel coordinates to latitude and longitude
+    if boolzoom==True:
+        longdisp=((mxdisp-(width/2))*scalelongin)+longcenter
+        latdisp=(((height/2)-mydisp)*scalelatin)+latcenter
+        longdisp=float("{0:.6f}".format(longdisp)) #6 decimal digits
+        latdisp=float("{0:.6f}".format(latdisp))
+    else:
+        
+        longdisp=((mxdisp-(width/2))*scalelongout)+longcenter
+        latdisp=(((height/2)-mydisp)*scalelatout)+latcenter
+        longdisp=float("{0:.6f}".format(longdisp)) #6 decimal digits
+        latdisp=float("{0:.6f}".format(latdisp))
     """*******************SELECT ANGLE INFORMATION**************************"""
     #If in Auto Mode the indexes are set by the clock
     if boolmode==False:
@@ -256,9 +279,9 @@ while True:
     textang1=myfont.render("Azimut: "+str(angledeg)+" degrees",0,GREEN)
     textang2=myfont.render("Elevation: "+str(elevang)+" degrees",0,BLUE2)
     if boolcursor==True: 
-        textcursor=myfont.render("X: "+str(mxdisp)+" Y: "+str(mydisp),0,YELLOW)
+        textcursor=myfont.render("Lat: "+str(latdisp)+" Long: "+str(longdisp),0,YELLOW)
     else:#Freezes coordinates when saving location
-        textcursor=myfont.render("X: "+str(mxfixed)+" Y: "+str(myfixed)+" fixed",0,YELLOW)
+        textcursor=myfont.render("Lat: "+str(latfixed)+" Long: "+str(longfixed)+" (F)",0,YELLOW)
     texttime=myfont.render(str(timerdisp)+" seconds",0,YELLOW)
     #Black background
     screen.fill(GREY2)
