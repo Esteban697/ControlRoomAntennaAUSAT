@@ -257,12 +257,12 @@ while True:
     pygame.display.set_caption("Ground Station")
     if boolzoom == True:
         layer = pygame.image.load("mapin.png")
-        scalex=(width/2)*2
-        scaley=(height/2)*2
+        scalex=(width/2)*9
+        scaley=(height/2)*9
     else:
         layer = pygame.image.load("mapout.png")
-        scalex=(width/2)*1.2
-        scaley=(height/2)*1.2
+        scalex=(width/2)*1
+        scaley=(height/2)*1
     cursor=pygame.image.load("arrow.png")
     margmarkx1=pygame.image.load("marginmarkerx1.png")
     margmarkx2=pygame.image.load("marginmarkerx2.png")
