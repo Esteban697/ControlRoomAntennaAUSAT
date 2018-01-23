@@ -2,20 +2,20 @@
 """
 Created on Tue Jan 09 11:59:51 2018
 
-@author: esteban struve
+@author: Esteban Struve
 """
 import csv
 
-#Define limits for the range of angles of direction and inclination
-firstdirec=0
-lastdirec=360
-minang=0
-maxang=120
+#Define limits for the range of angles of Azimuth and Elevation
+firstaz=0
+lastaz=360
+minelev=0
+maxelev=180
 #Build the ranges
-angdir=range(firstdirec,lastdirec+1)
-angincl=range(minang,maxang+1)
-#Store data into a single csv file
-myData = [angdir, angincl]  
+angaz=range(firstaz,lastaz+1) #for Azimuth
+angelev=range(minelev,maxelev+1) #for Elevation
+#Save data into a single csv file
+myData = [angaz, angelev]  
 myFile = open('angles.csv', 'w')  
 with myFile:  
    writer = csv.writer(myFile)
