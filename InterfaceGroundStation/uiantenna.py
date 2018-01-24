@@ -265,8 +265,8 @@ while True:
         scaley=(height/2)*9
     else:
         layer = pygame.image.load("mapout.png") #Map 2 chosen
-        scalex=(width/2)*1
-        scaley=(height/2)*1
+        scalex=(width/2)*3
+        scaley=(height/2)*3
     cursor=pygame.image.load("arrow.png") #load cursor arrow
     margmarkx1=pygame.image.load("marginmarkerx1.png") #load all margin markers
     margmarkx2=pygame.image.load("marginmarkerx2.png")
